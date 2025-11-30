@@ -1,4 +1,10 @@
 package com.example.edunotes.ui.nav
 
-sealed class NavRoutes() {
+sealed class NavRoutes(val route: String) {
+    data object Login : NavRoutes("login")
+    data object Register : NavRoutes("register")
+    data object Home : NavRoutes("home")
+    data object Profile : NavRoutes("profile")
+    data object Notes : NavRoutes("note")
+    data object Tasks : NavRoutes("task")
 }

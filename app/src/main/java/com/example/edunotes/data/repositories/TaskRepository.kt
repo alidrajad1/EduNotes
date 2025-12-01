@@ -5,34 +5,48 @@ import com.example.edunotes.data.remote.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.storage.storage
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class TaskRepository {
     private val client = SupabaseClient.client
 
+    // Read
     suspend fun getTasks(): List<Task> {
         return client.from("tasks").select {
-            order("deadline", Order.ASCENDING)
+            order("deadline", Order.ASCENDING) // Deadline terdekat muncul duluan
         }.decodeList()
     }
 
+    // Insert
     suspend fun addTask(task: Task, attachmentBytes: ByteArray?) {
         var finalUrl: String? = null
-        // Upload Foto Soal/Lampiran
+
+        // Upload Foto Soal (Jika ada)
         if (attachmentBytes != null) {
             val fileName = "task-${System.currentTimeMillis()}.jpg"
             val bucket = client.storage.from("task-attachments")
             bucket.upload(fileName, attachmentBytes)
             finalUrl = bucket.publicUrl(fileName)
         }
-        // Insert DB
+
         val newTask = task.copy(attachmentUrl = finalUrl)
         client.from("tasks").insert(newTask)
     }
 
+    // Update Status (Checkbox) - Pake buildJsonObject biar aman
     suspend fun toggleTaskStatus(taskId: Long, isCompleted: Boolean) {
-        client.from("tasks").update(
-            { set("is_completed", isCompleted) }
-        ) {
+        val updateData = buildJsonObject {
+            put("is_completed", isCompleted)
+        }
+        client.from("tasks").update(updateData) {
+            filter { eq("id", taskId) }
+        }
+    }
+
+    // Delete
+    suspend fun deleteTask(taskId: Long) {
+        client.from("tasks").delete {
             filter { eq("id", taskId) }
         }
     }

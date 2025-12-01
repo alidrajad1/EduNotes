@@ -15,8 +15,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -47,11 +50,39 @@ fun HomeScreen(
 
     // State untuk Dialog (Bisa Mode Tambah atau Edit)
     var showDialog by remember { mutableStateOf(false) }
-    var categoryToEdit by remember { mutableStateOf<Category?>(null) } // Data kategori yg mau diedit
+    var categoryToEdit by remember { mutableStateOf<Category?>(null) }
 
     val context = LocalContext.current
 
     Scaffold(
+        // --- 1. TAMBAHAN NAVIGASI BAWAH (BOTTOM BAR) ---
+        bottomBar = {
+            NavigationBar {
+                // Tombol Home (Aktif)
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Materi") },
+                    selected = true, // Karena kita sedang di HomeScreen
+                    onClick = { /* Tidak melakukan apa-apa karena sudah di sini */ }
+                )
+                // Tombol Tugas
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.CheckBox, contentDescription = "Tugas") },
+                    label = { Text("Tugas") },
+                    selected = false,
+                    onClick = { navController.navigate(NavRoutes.Tasks.route) }
+                )
+                // Tombol Catatan
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.EditNote, contentDescription = "Catatan") },
+                    label = { Text("Catatan") },
+                    selected = false,
+                    onClick = { navController.navigate(NavRoutes.Notes.route) }
+                )
+            }
+        },
+        // -----------------------------------------------
+
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -122,12 +153,19 @@ fun HomeScreen(
                                 CategoryItem(
                                     category = category,
                                     onClick = {
-                                        Toast.makeText(context, "Membuka ${category.name}", Toast.LENGTH_SHORT).show()
-                                        // TODO: Navigasi ke Materi
+                                        if (category.id != null) {
+                                            val route = NavRoutes.MaterialList.createRoute(
+                                                categoryId = category.id,
+                                                categoryName = category.name
+                                            )
+                                            navController.navigate(route)
+                                        } else {
+                                            Toast.makeText(context, "Error: ID Kategori Null", Toast.LENGTH_SHORT).show()
+                                        }
                                     },
                                     onEdit = {
-                                        categoryToEdit = category // Set data yg mau diedit
-                                        showDialog = true // Buka dialog
+                                        categoryToEdit = category
+                                        showDialog = true
                                     },
                                     onDelete = {
                                         category.id?.let { viewModel.deleteCategory(it) }
@@ -141,10 +179,10 @@ fun HomeScreen(
         }
     }
 
-    // --- DIALOG (REUSABLE UNTUK ADD & EDIT) ---
+    // --- DIALOG (REUSABLE) ---
     if (showDialog) {
         CategoryFormDialog(
-            initialCategory = categoryToEdit, // Kirim data jika mode edit
+            initialCategory = categoryToEdit,
             isUploading = isUploading,
             onDismiss = { showDialog = false },
             onConfirm = { name, uri ->
@@ -178,14 +216,13 @@ fun CategoryItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp) // Sedikit lebih tinggi buat muat tombol
+            .height(160.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Konten Tengah
             Column(
                 modifier = Modifier.align(Alignment.Center),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -203,38 +240,27 @@ fun CategoryItem(
                 Text(category.name, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             }
 
-            // Tombol Edit (Kiri Atas)
-            IconButton(
-                onClick = onEdit,
-                modifier = Modifier.align(Alignment.TopStart)
-            ) {
+            IconButton(onClick = onEdit, modifier = Modifier.align(Alignment.TopStart)) {
                 Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
             }
 
-            // Tombol Hapus (Kanan Atas)
-            IconButton(
-                onClick = onDelete,
-                modifier = Modifier.align(Alignment.TopEnd)
-            ) {
+            IconButton(onClick = onDelete, modifier = Modifier.align(Alignment.TopEnd)) {
                 Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error)
             }
         }
     }
 }
 
-// --- DIALOG FORM (GABUNGAN ADD & EDIT) ---
+// --- DIALOG FORM ---
 @Composable
 fun CategoryFormDialog(
-    initialCategory: Category? = null, // Null = Mode Tambah
+    initialCategory: Category? = null,
     isUploading: Boolean,
     onDismiss: () -> Unit,
     onConfirm: (String, Uri?) -> Unit
 ) {
-    // Jika mode edit, isi default value dari data yang ada
     var name by remember { mutableStateOf(initialCategory?.name ?: "") }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
-    // Tentukan Judul
     val title = if (initialCategory == null) "Tambah Kategori" else "Edit Kategori"
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -260,10 +286,6 @@ fun CategoryFormDialog(
                         .clickable { photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                     contentAlignment = Alignment.Center
                 ) {
-                    // Prioritas Tampilan Gambar:
-                    // 1. Gambar baru dipilih (Uri)
-                    // 2. Gambar lama dari internet (initialCategory.iconUrl)
-                    // 3. Placeholder kosong
                     if (selectedImageUri != null) {
                         AsyncImage(model = selectedImageUri, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
                     } else if (initialCategory?.iconUrl != null) {

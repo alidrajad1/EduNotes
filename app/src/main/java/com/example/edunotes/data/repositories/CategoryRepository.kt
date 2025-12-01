@@ -4,6 +4,8 @@ import com.example.edunotes.data.model.Category
 import com.example.edunotes.data.remote.SupabaseClient
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.storage.storage
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 class CategoryRepository {
     private val client = SupabaseClient.client
@@ -34,7 +36,7 @@ class CategoryRepository {
     suspend fun updateCategory(id: Long, name: String, iconBytes: ByteArray?) {
         var finalUrl: String? = null
 
-        // 1. Jika user upload gambar baru, upload dulu
+        // 1. Upload Gambar Baru (Jika ada)
         if (iconBytes != null) {
             val fileName = "icon-${System.currentTimeMillis()}.jpg"
             val bucket = client.storage.from("category-icons")
@@ -42,15 +44,17 @@ class CategoryRepository {
             finalUrl = bucket.publicUrl(fileName)
         }
 
-        // 2. Siapkan data yang mau di-update
-        val updateData = mutableMapOf<String, Any>("name" to name)
+        // 2. Gunakan buildJsonObject (Bukan Map<String, Any>)
+        val updateData = buildJsonObject {
+            put("name", name) // Update nama
 
-        // Hanya update URL jika ada gambar baru (biar gambar lama gak hilang)
-        if (finalUrl != null) {
-            updateData["icon_url"] = finalUrl
+            // Hanya update URL jika ada gambar baru
+            if (finalUrl != null) {
+                put("icon_url", finalUrl)
+            }
         }
 
-        // 3. Kirim ke Database
+        // 3. Kirim ke Supabase
         client.from("categories").update(updateData) {
             filter { eq("id", id) }
         }

@@ -7,4 +7,13 @@ sealed class NavRoutes(val route: String) {
     data object Profile : NavRoutes("profile")
     data object Notes : NavRoutes("note")
     data object Tasks : NavRoutes("task")
+
+    object MaterialList {
+        const val route = "material_list/{categoryId}/{categoryName}"
+
+        // Fungsi helper untuk membuat link navigasi
+        fun createRoute(categoryId: Long, categoryName: String): String {
+            return "material_list/$categoryId/$categoryName"
+        }
+    }
 }

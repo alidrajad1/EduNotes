@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.edunotes.data.model.Category
 import com.example.edunotes.data.remote.SupabaseClient
 import com.example.edunotes.data.repositories.CategoryRepository
-import com.example.edunotes.data.repositories.ProfileRepository // Import ProfileRepo
+import com.example.edunotes.data.repositories.ProfileRepository
 import io.github.jan.supabase.auth.auth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,14 +15,14 @@ sealed class HomeUiState {
     data object Loading : HomeUiState()
     data class Success(
         val categories: List<Category>,
-        val userName: String // Tambahan field nama
+        val userName: String
     ) : HomeUiState()
     data class Error(val message: String) : HomeUiState()
 }
 
 class HomeViewModel : ViewModel() {
     private val categoryRepo = CategoryRepository()
-    private val profileRepo = ProfileRepository() // Tambahkan repo profil
+    private val profileRepo = ProfileRepository()
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)
     val uiState = _uiState.asStateFlow()
@@ -44,7 +44,7 @@ class HomeViewModel : ViewModel() {
                 // 2. Ambil Nama User (Info Header)
                 val userId = SupabaseClient.client.auth.currentUserOrNull()?.id ?: ""
                 val profile = profileRepo.getUserProfile(userId)
-                val name = profile?.fullName ?: "Pelajar" // Default jika nama belum diisi
+                val name = profile?.fullName ?: "Pelajar"
 
                 _uiState.value = HomeUiState.Success(categories, name)
             } catch (e: Exception) {
@@ -71,7 +71,7 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    // Fungsi Edit (Update) - BARU
+    // Fungsi Edit (Update)
     fun updateCategory(id: Long, name: String, iconBytes: ByteArray?) {
         viewModelScope.launch {
             _uploadState.value = true

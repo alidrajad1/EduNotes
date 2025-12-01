@@ -45,7 +45,7 @@ fun RegisterScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is AuthUiState.Success -> {
-                Toast.makeText(context, "Register Success", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Register Berhasil", Toast.LENGTH_SHORT).show()
                 onRegisterSuccess()
                 viewModel.resetState()
             }
@@ -106,7 +106,7 @@ fun RegisterScreen(
         EduTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = "Confirm Password",
+            label = "Konfirmasi Password",
             isPassword = true
         )
 
@@ -120,10 +120,10 @@ fun RegisterScreen(
                     if (password == confirmPassword) {
                         viewModel.register(email, password)
                     } else {
-                        Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Password tidak sama", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    Toast.makeText(context, "Email and password cannot be empty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Email dan password harus diisi", Toast.LENGTH_SHORT).show()
                 }
             }
         )

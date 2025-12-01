@@ -44,7 +44,7 @@ fun LoginScreen(
     LaunchedEffect(uiState) {
         when (uiState) {
             is AuthUiState.Success -> {
-                Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Login Berhasil", Toast.LENGTH_SHORT).show()
                 onLoginSuccess()
                 viewModel.resetState()
             }
@@ -110,7 +110,7 @@ fun LoginScreen(
                 if (email.isNotBlank() && password.isNotBlank()) {
                     viewModel.login(email, password)
                 } else {
-                    Toast.makeText(context, "Email and password cannot be empty", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Email dan password harus diisi", Toast.LENGTH_SHORT).show()
                 }
             }
         )

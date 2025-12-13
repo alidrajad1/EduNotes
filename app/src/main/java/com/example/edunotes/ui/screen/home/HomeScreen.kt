@@ -48,31 +48,28 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsState()
     val isUploading by viewModel.uploadState.collectAsState()
 
-    // State untuk Dialog (Bisa Mode Tambah atau Edit)
     var showDialog by remember { mutableStateOf(false) }
     var categoryToEdit by remember { mutableStateOf<Category?>(null) }
 
     val context = LocalContext.current
 
     Scaffold(
-        // --- 1. TAMBAHAN NAVIGASI BAWAH (BOTTOM BAR) ---
         bottomBar = {
             NavigationBar {
-                // Tombol Home (Aktif)
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Materi") },
-                    selected = true, // Karena kita sedang di HomeScreen
-                    onClick = { /* Tidak melakukan apa-apa karena sudah di sini */ }
+                    selected = true,
+                    onClick = {}
                 )
-                // Tombol Tugas
+
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.CheckBox, contentDescription = "Tugas") },
                     label = { Text("Tugas") },
                     selected = false,
                     onClick = { navController.navigate(NavRoutes.Tasks.route) }
                 )
-                // Tombol Catatan
+
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.EditNote, contentDescription = "Catatan") },
                     label = { Text("Catatan") },
@@ -81,12 +78,12 @@ fun HomeScreen(
                 )
             }
         },
-        // -----------------------------------------------
+
 
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    categoryToEdit = null // Reset jadi mode tambah
+                    categoryToEdit = null
                     showDialog = true
                 },
                 containerColor = MaterialTheme.colorScheme.primary
@@ -101,7 +98,7 @@ fun HomeScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
-            // --- HEADER DINAMIS ---
+
             val userName = (uiState as? HomeUiState.Success)?.userName ?: "Pelajar"
 
             Row(
@@ -125,7 +122,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // --- KONTEN GRID ---
             when (val state = uiState) {
                 is HomeUiState.Loading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -179,7 +175,6 @@ fun HomeScreen(
         }
     }
 
-    // --- DIALOG (REUSABLE) ---
     if (showDialog) {
         CategoryFormDialog(
             initialCategory = categoryToEdit,
@@ -191,10 +186,8 @@ fun HomeScreen(
                 }
 
                 if (categoryToEdit == null) {
-                    // Mode TAMBAH
                     viewModel.addCategory(name, bytes)
                 } else {
-                    // Mode EDIT
                     categoryToEdit?.id?.let { id ->
                         viewModel.updateCategory(id, name, bytes)
                     }
@@ -205,7 +198,6 @@ fun HomeScreen(
     }
 }
 
-// --- ITEM GRID KATEGORI ---
 @Composable
 fun CategoryItem(
     category: Category,
@@ -251,7 +243,6 @@ fun CategoryItem(
     }
 }
 
-// --- DIALOG FORM ---
 @Composable
 fun CategoryFormDialog(
     initialCategory: Category? = null,

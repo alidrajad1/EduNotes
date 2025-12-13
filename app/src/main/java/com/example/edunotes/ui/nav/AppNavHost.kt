@@ -65,11 +65,9 @@ fun AppNavHost(
                 navArgument("categoryName") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            // Ambil data yang dikirim dari Home
             val categoryId = backStackEntry.arguments?.getLong("categoryId") ?: 0L
             val categoryName = backStackEntry.arguments?.getString("categoryName") ?: "Materi"
 
-            // Panggil Screen Materi (Kirim ID dan Nama ke sana)
             MaterialScreen(
                 navController = navController,
                 categoryId = categoryId,

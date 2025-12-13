@@ -192,12 +192,10 @@ fun AddTaskDialog(
 
     val context = LocalContext.current
 
-    // Logic DatePicker
     val calendar = Calendar.getInstance()
     val datePickerDialog = DatePickerDialog(
         context,
         { _, year, month, day ->
-            // Format YYYY-MM-DD (Supabase Date Format)
             val formattedMonth = (month + 1).toString().padStart(2, '0')
             val formattedDay = day.toString().padStart(2, '0')
             date = "$year-$formattedMonth-$formattedDay"
@@ -220,7 +218,6 @@ fun AddTaskDialog(
                 EduTextField(value = title, onValueChange = { title = it }, label = "Judul Tugas")
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Input Tanggal (Clickable)
                 OutlinedTextField(
                     value = date,
                     onValueChange = {},
@@ -236,7 +233,6 @@ fun AddTaskDialog(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Input Gambar
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Button(onClick = {
                         photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))

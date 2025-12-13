@@ -19,7 +19,6 @@ class ProfileRepository {
     suspend fun updateProfile(userId: String, name: String, school: String, imageBytes: ByteArray?) {
         var avatarUrl: String? = null
 
-        // 1. Upload Avatar
         if (imageBytes != null) {
             val fileName = "$userId-${System.currentTimeMillis()}.jpg"
             val bucket = db.storage.from("avatars")
@@ -29,9 +28,8 @@ class ProfileRepository {
             avatarUrl = bucket.publicUrl(fileName)
         }
 
-        // 2. Siapkan Data (Pakai buildJsonObject)
         val updateData = buildJsonObject {
-            put("id", userId) // <--- WAJIB DITAMBAHKAN untuk Upsert
+            put("id", userId)
             put("full_name", name)
             put("school_name", school)
 
@@ -40,10 +38,8 @@ class ProfileRepository {
             }
         }
 
-        // 3. GANTI 'update' MENJADI 'upsert'
-        // Upsert = Kalau data belum ada, buat baru. Kalau sudah ada, update.
         db.from("profiles").upsert(updateData) {
-            onConflict = "id" // Kunci uniknya adalah ID
+            onConflict = "id"
         }
     }
 }

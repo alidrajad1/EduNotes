@@ -50,15 +50,11 @@ fun MaterialScreen(
     var showAddDialog by remember { mutableStateOf(false) }
     var selectedMaterial by remember { mutableStateOf<Material?>(null) }
 
-    // Load data otomatis
     LaunchedEffect(categoryId) {
         viewModel.loadMaterials(categoryId)
     }
 
-    // --- LOGIKA TAMPILAN ---
-    // Jika ada materi yang dipilih, TAMPILKAN LAYAR PENUH DETAIL
     if (selectedMaterial != null) {
-        // Tangkap tombol Back HP agar menutup detail, bukan keluar app
         BackHandler { selectedMaterial = null }
 
         MaterialDetailFullScreen(
@@ -75,7 +71,6 @@ fun MaterialScreen(
             }
         )
     }
-    // Jika tidak ada yang dipilih, TAMPILKAN LIST MATERI BIASA
     else {
         Scaffold(
             topBar = {
@@ -134,7 +129,6 @@ fun MaterialScreen(
         }
     }
 
-    // Dialog Tambah (Tetap Popup Kecil)
     if (showAddDialog) {
         MaterialFormDialog(
             titleDialog = "Tambah Materi Baru",
@@ -152,7 +146,6 @@ fun MaterialScreen(
     }
 }
 
-// --- KOMPONEN ITEM LIST ---
 @Composable
 fun MaterialItem(
     material: Material,
@@ -199,7 +192,6 @@ fun MaterialItem(
     }
 }
 
-// --- LAYAR PENUH DETAIL & EDIT ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MaterialDetailFullScreen(
@@ -210,7 +202,6 @@ fun MaterialDetailFullScreen(
 ) {
     var isEditing by remember { mutableStateOf(false) }
 
-    // State Form
     var title by remember { mutableStateOf(material.title) }
     var content by remember { mutableStateOf(material.content) }
     var selectedUri by remember { mutableStateOf<Uri?>(null) }
@@ -220,20 +211,17 @@ fun MaterialDetailFullScreen(
         onResult = { selectedUri = it }
     )
 
-    // Gunakan Surface agar menutupi layar list di belakangnya
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = { Text(if (isEditing) "Edit Materi" else "Detail Materi") },
                     navigationIcon = {
-                        // Tombol Close/Back
                         IconButton(onClick = onDismiss) {
                             Icon(Icons.Default.Close, contentDescription = "Tutup")
                         }
                     },
                     actions = {
-                        // Tombol Edit (Hanya di mode baca)
                         if (!isEditing) {
                             IconButton(onClick = { isEditing = true }) {
                                 Icon(Icons.Default.Edit, contentDescription = "Edit")
@@ -253,9 +241,7 @@ fun MaterialDetailFullScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp)
             ) {
-                // --- BAGIAN GAMBAR ---
                 if (isEditing) {
-                    // Mode Edit: Area Ganti Foto
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -277,7 +263,6 @@ fun MaterialDetailFullScreen(
                         }
                     }
                 } else {
-                    // Mode Baca: Tampilkan Foto Full
                     if (material.imageUrl != null) {
                         AsyncImage(
                             model = material.imageUrl,
@@ -294,7 +279,6 @@ fun MaterialDetailFullScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // --- BAGIAN KONTEN ---
                 if (isEditing) {
                     EduTextField(value = title, onValueChange = { title = it }, label = "Judul")
                     Spacer(modifier = Modifier.height(12.dp))
@@ -318,7 +302,6 @@ fun MaterialDetailFullScreen(
                         }
                     }
                 } else {
-                    // Mode Baca: Teks yang nyaman dibaca
                     Text(
                         text = material.title,
                         style = MaterialTheme.typography.headlineMedium,
@@ -327,7 +310,6 @@ fun MaterialDetailFullScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Garis pembatas tipis
                     HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -343,7 +325,6 @@ fun MaterialDetailFullScreen(
     }
 }
 
-// --- DIALOG TAMBAH (POPUP KECIL) ---
 @Composable
 fun MaterialFormDialog(
     titleDialog: String,

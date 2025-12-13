@@ -14,7 +14,7 @@ class TaskRepository {
     // Read
     suspend fun getTasks(): List<Task> {
         return client.from("tasks").select {
-            order("deadline", Order.ASCENDING) // Deadline terdekat muncul duluan
+            order("deadline", Order.ASCENDING)
         }.decodeList()
     }
 
@@ -34,7 +34,6 @@ class TaskRepository {
         client.from("tasks").insert(newTask)
     }
 
-    // Update Status (Checkbox) - Pake buildJsonObject biar aman
     suspend fun toggleTaskStatus(taskId: Long, isCompleted: Boolean) {
         val updateData = buildJsonObject {
             put("is_completed", isCompleted)
@@ -44,7 +43,6 @@ class TaskRepository {
         }
     }
 
-    // Delete
     suspend fun deleteTask(taskId: Long) {
         client.from("tasks").delete {
             filter { eq("id", taskId) }

@@ -66,8 +66,8 @@ class MaterialViewModel : ViewModel() {
     fun deleteMaterial(materialId: Long, categoryId: Long) {
         viewModelScope.launch {
             try {
-                repository.deleteMaterial(materialId) // Pastikan fungsi ini ada di Repo
-                loadMaterials(categoryId) // Refresh list
+                repository.deleteMaterial(materialId)
+                loadMaterials(categoryId)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -78,7 +78,7 @@ class MaterialViewModel : ViewModel() {
         viewModelScope.launch {
             _uploadState.value = true
             try {
-                repository.updateMaterial(materialId, title, content, imageBytes) // Pastikan fungsi ini ada di Repo
+                repository.updateMaterial(materialId, title, content, imageBytes)
                 loadMaterials(categoryId)
             } catch (e: Exception) {
                 e.printStackTrace()

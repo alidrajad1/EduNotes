@@ -16,14 +16,14 @@ class CategoryRepository {
 
     suspend fun addCategory(category: Category, iconBytes: ByteArray?) {
         var finalUrl = category.iconUrl
-        // Upload Icon
+
         if (iconBytes != null) {
             val fileName = "icon-${System.currentTimeMillis()}.jpg"
             val bucket = client.storage.from("category-icons")
             bucket.upload(fileName, iconBytes)
             finalUrl = bucket.publicUrl(fileName)
         }
-        // Insert DB
+
         val newCategory = category.copy(iconUrl = finalUrl)
         client.from("categories").insert(newCategory)
     }
@@ -36,25 +36,21 @@ class CategoryRepository {
     suspend fun updateCategory(id: Long, name: String, iconBytes: ByteArray?) {
         var finalUrl: String? = null
 
-        // 1. Upload Gambar Baru (Jika ada)
-        if (iconBytes != null) {
+               if (iconBytes != null) {
             val fileName = "icon-${System.currentTimeMillis()}.jpg"
             val bucket = client.storage.from("category-icons")
             bucket.upload(fileName, iconBytes)
             finalUrl = bucket.publicUrl(fileName)
         }
 
-        // 2. Gunakan buildJsonObject (Bukan Map<String, Any>)
         val updateData = buildJsonObject {
             put("name", name) // Update nama
 
-            // Hanya update URL jika ada gambar baru
             if (finalUrl != null) {
                 put("icon_url", finalUrl)
             }
         }
 
-        // 3. Kirim ke Supabase
         client.from("categories").update(updateData) {
             filter { eq("id", id) }
         }

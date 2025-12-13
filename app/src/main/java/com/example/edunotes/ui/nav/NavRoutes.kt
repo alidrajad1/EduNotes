@@ -11,7 +11,6 @@ sealed class NavRoutes(val route: String) {
     object MaterialList {
         const val route = "material_list/{categoryId}/{categoryName}"
 
-        // Fungsi helper untuk membuat link navigasi
         fun createRoute(categoryId: Long, categoryName: String): String {
             return "material_list/$categoryId/$categoryName"
         }

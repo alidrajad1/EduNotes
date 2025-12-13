@@ -1,5 +1,6 @@
 package com.example.edunotes.data.model
 
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -11,5 +12,5 @@ data class Material(
     val title: String,
     val content: String,
     @SerialName("image_url") val imageUrl: String? = null,
-    @SerialName("created_at") val createdAt: String? = null
+    @SerialName("created_at") val createdAt: Instant? = null
 )

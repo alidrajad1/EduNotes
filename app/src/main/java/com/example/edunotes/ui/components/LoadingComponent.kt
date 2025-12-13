@@ -14,7 +14,7 @@ fun FullScreenLoading() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White), // atau MaterialTheme.colorScheme.background
+            .background(Color.White),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator()

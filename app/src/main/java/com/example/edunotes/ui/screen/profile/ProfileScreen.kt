@@ -37,26 +37,21 @@ import com.example.edunotes.ui.components.EduTextField
 
 @Composable
 fun ProfileScreen(
-    navController: NavController,
     onLogout: () -> Unit,
     viewModel: ProfileViewModel = viewModel()
-) {
-    // 1. Observe State
-    val uiState by viewModel.uiState.collectAsState()
+) { val uiState by viewModel.uiState.collectAsState()
+
     val isUploading by viewModel.isUploading.collectAsState()
 
-    // 2. State Lokal Data Form
     var fullName by remember { mutableStateOf("") }
     var schoolName by remember { mutableStateOf("") }
     var avatarUrl by remember { mutableStateOf<String?>(null) }
 
-    // 3. State Mode Edit & Gambar Pilihan
     var isEditing by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     val context = LocalContext.current
 
-    // Mengisi data saat load berhasil (dari Server)
     LaunchedEffect(uiState) {
         if (uiState is ProfileUiState.Success) {
             val data = (uiState as ProfileUiState.Success).profile
@@ -66,7 +61,6 @@ fun ProfileScreen(
         }
     }
 
-    // --- LAUNCHER GALERI (INI KUNCINYA) ---
     val photoLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> selectedImageUri = uri }
@@ -79,7 +73,6 @@ fun ProfileScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // --- HEADER ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -92,7 +85,6 @@ fun ProfileScreen(
                 color = MaterialTheme.colorScheme.primary
             )
 
-            // Tombol Edit (Hanya muncul jika TIDAK sedang mengedit)
             if (!isEditing) {
                 IconButton(onClick = { isEditing = true }) {
                     Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
@@ -102,13 +94,11 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- AVATAR (FOTO PROFIL) ---
         Box(
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
                 .background(Color.LightGray)
-                // Hanya bisa diklik saat Mode Edit
                 .clickable(enabled = isEditing) {
                     photoLauncher.launch(
                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -116,8 +106,6 @@ fun ProfileScreen(
                 },
             contentAlignment = Alignment.Center
         ) {
-            // Prioritas Tampilan:
-            // 1. Gambar Baru (Preview) -> 2. Gambar Server (Lama) -> 3. Icon Default
             if (selectedImageUri != null) {
                 AsyncImage(model = selectedImageUri, contentDescription = null, modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             } else if (avatarUrl != null) {
@@ -126,7 +114,6 @@ fun ProfileScreen(
                 Icon(Icons.Default.Person, contentDescription = null, modifier = Modifier.size(60.dp), tint = Color.Gray)
             }
 
-            // Overlay Icon Kamera (Hanya muncul saat Mode Edit)
             if (isEditing) {
                 Box(
                     modifier = Modifier
@@ -141,23 +128,18 @@ fun ProfileScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // --- KONTEN DATA DIRI ---
         if (isEditing) {
-            // MODE EDIT: Tampilkan TextField
             EduTextField(value = fullName, onValueChange = { fullName = it }, label = "Nama Lengkap")
             Spacer(modifier = Modifier.height(16.dp))
             EduTextField(value = schoolName, onValueChange = { schoolName = it }, label = "Asal Sekolah")
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Tombol Aksi (Simpan & Batal)
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Tombol Batal
                 OutlinedButton(
                     onClick = {
                         isEditing = false
-                        selectedImageUri = null // Reset gambar pilihan
-                        // Reload data asli (opsional, bisa panggil viewModel.loadProfile() lagi)
+                        selectedImageUri = null
                     },
                     modifier = Modifier.weight(1f)
                 ) {
@@ -166,10 +148,8 @@ fun ProfileScreen(
                     Text("Batal")
                 }
 
-                // Tombol Simpan
                 Button(
                     onClick = {
-                        // Ubah URI ke ByteArray untuk Upload
                         val bytes = selectedImageUri?.let { uri ->
                             context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
                         }
@@ -177,7 +157,6 @@ fun ProfileScreen(
                         viewModel.updateProfile(fullName, schoolName, bytes)
                         Toast.makeText(context, "Menyimpan...", Toast.LENGTH_SHORT).show()
 
-                        // isEditing akan diset false nanti kalau sukses (atau manual disini)
                         isEditing = false
                     },
                     enabled = !isUploading,
@@ -194,14 +173,12 @@ fun ProfileScreen(
             }
 
         } else {
-            // MODE DETAIL: Tampilkan Teks Biasa (Read-Only)
             ProfileInfoItem(label = "Nama Lengkap", value = fullName.ifEmpty { "-" })
             Spacer(modifier = Modifier.height(16.dp))
             ProfileInfoItem(label = "Asal Sekolah", value = schoolName.ifEmpty { "-" })
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Tombol Logout
             OutlinedButton(
                 onClick = {
                     viewModel.logout()
@@ -218,7 +195,6 @@ fun ProfileScreen(
     }
 }
 
-// Komponen Helper untuk tampilan Detail
 @Composable
 fun ProfileInfoItem(label: String, value: String) {
     Column(

@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 sealed class ProfileUiState {
     data object Loading : ProfileUiState()
-    data class Success(val profile: Profile?) : ProfileUiState() // Profile bisa null jika belum diload
+    data class Success(val profile: Profile?) : ProfileUiState()
     data class Error(val message: String) : ProfileUiState()
 }
 
@@ -33,7 +33,6 @@ class ProfileViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = ProfileUiState.Loading
             try {
-                // Ambil ID user yang sedang login
                 val userId = SupabaseClient.client.auth.currentUserOrNull()?.id ?: ""
 
                 if (userId.isNotEmpty()) {
@@ -55,11 +54,10 @@ class ProfileViewModel : ViewModel() {
                 val userId = SupabaseClient.client.auth.currentUserOrNull()?.id ?: ""
                 if (userId.isNotEmpty()) {
                     repository.updateProfile(userId, name, school, imageBytes)
-                    // Refresh data setelah update
                     loadProfile()
                 }
             } catch (e: Exception) {
-                e.printStackTrace() // Log error
+                e.printStackTrace()
             } finally {
                 _isUploading.value = false
             }

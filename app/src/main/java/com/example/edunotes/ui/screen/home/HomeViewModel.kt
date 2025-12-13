@@ -38,10 +38,8 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = HomeUiState.Loading
             try {
-                // 1. Ambil Kategori
                 val categories = categoryRepo.getCategories()
 
-                // 2. Ambil Nama User (Info Header)
                 val userId = SupabaseClient.client.auth.currentUserOrNull()?.id ?: ""
                 val profile = profileRepo.getUserProfile(userId)
                 val name = profile?.fullName ?: "Pelajar"
@@ -54,7 +52,6 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    // Fungsi Tambah (Add)
     fun addCategory(name: String, iconBytes: ByteArray?) {
         viewModelScope.launch {
             _uploadState.value = true
@@ -71,7 +68,6 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    // Fungsi Edit (Update)
     fun updateCategory(id: Long, name: String, iconBytes: ByteArray?) {
         viewModelScope.launch {
             _uploadState.value = true
@@ -86,7 +82,6 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    // Fungsi Hapus
     fun deleteCategory(categoryId: Long) {
         viewModelScope.launch {
             try {

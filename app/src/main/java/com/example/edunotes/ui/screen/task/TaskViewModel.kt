@@ -70,10 +70,8 @@ class TaskViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val newStatus = !task.isCompleted
-                // Kirim ke server
                 task.id?.let { repository.toggleTaskStatus(it, newStatus) }
 
-                // Refresh UI (Idealnya update lokal dulu biar cepat, tapi reload juga oke)
                 loadTasks()
             } catch (e: Exception) {
                 e.printStackTrace()

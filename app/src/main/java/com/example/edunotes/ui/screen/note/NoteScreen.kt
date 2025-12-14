@@ -43,13 +43,11 @@ fun NoteScreen(
     val uiState by viewModel.uiState.collectAsState()
     val isUploading by viewModel.uploadState.collectAsState()
 
-    // State UI
     var showAddDialog by remember { mutableStateOf(false) }
-    var selectedNote by remember { mutableStateOf<StudyNote?>(null) } // Jika tidak null, tampilkan detail
+    var selectedNote by remember { mutableStateOf<StudyNote?>(null) }
 
-    // 1. TAMPILAN DETAIL FULL SCREEN (Jika ada note dipilih)
     if (selectedNote != null) {
-        BackHandler { selectedNote = null } // Handle Back Button HP
+        BackHandler { selectedNote = null }
 
         NoteDetailFullScreen(
             note = selectedNote!!,
@@ -63,7 +61,6 @@ fun NoteScreen(
             }
         )
     }
-    // 2. TAMPILAN UTAMA (LIST CATATAN)
     else {
         Scaffold(
             floatingActionButton = {
@@ -120,7 +117,6 @@ fun NoteScreen(
                                 Text("Belum ada catatan.", color = Color.Gray)
                             }
                         } else {
-                            // Gunakan Grid agar mirip Sticky Notes
                             LazyVerticalGrid(
                                 columns = GridCells.Fixed(2),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -141,7 +137,6 @@ fun NoteScreen(
         }
     }
 
-    // Dialog Tambah
     if (showAddDialog) {
         NoteFormDialog(
             isUploading = isUploading,
@@ -156,7 +151,6 @@ fun NoteScreen(
     }
 }
 
-// --- ITEM KARTU CATATAN ---
 @Composable
 fun NoteItem(
     note: StudyNote,
@@ -189,14 +183,12 @@ fun NoteItem(
                     color = Color.DarkGray
                 )
 
-                // Indikator ada gambar
                 if (note.mindmapUrl != null) {
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(Icons.Default.Image, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                 }
             }
 
-            // Tombol Hapus Kecil di pojok
             IconButton(
                 onClick = onDelete,
                 modifier = Modifier.align(Alignment.BottomEnd)
@@ -207,7 +199,6 @@ fun NoteItem(
     }
 }
 
-// --- DETAIL FULL SCREEN & EDIT ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoteDetailFullScreen(
@@ -248,7 +239,6 @@ fun NoteDetailFullScreen(
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                // GAMBAR MINDMAP
                 if (isEditing) {
                     Box(
                         modifier = Modifier
@@ -285,7 +275,6 @@ fun NoteDetailFullScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // FORM / TEKS
                 if (isEditing) {
                     EduTextField(value = title, onValueChange = { title = it }, label = "Judul")
                     Spacer(modifier = Modifier.height(8.dp))
@@ -308,7 +297,6 @@ fun NoteDetailFullScreen(
     }
 }
 
-// --- DIALOG TAMBAH ---
 @Composable
 fun NoteFormDialog(
     isUploading: Boolean,

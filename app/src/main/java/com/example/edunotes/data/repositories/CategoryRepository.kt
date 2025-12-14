@@ -36,7 +36,7 @@ class CategoryRepository {
     suspend fun updateCategory(id: Long, name: String, iconBytes: ByteArray?) {
         var finalUrl: String? = null
 
-               if (iconBytes != null) {
+        if (iconBytes != null) {
             val fileName = "icon-${System.currentTimeMillis()}.jpg"
             val bucket = client.storage.from("category-icons")
             bucket.upload(fileName, iconBytes)

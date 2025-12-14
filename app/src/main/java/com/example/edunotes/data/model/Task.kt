@@ -8,7 +8,7 @@ data class Task(
     val id: Long? = null,
     @SerialName("user_id") val userId: String,
     val title: String,
-    val deadline: String? = null, // Format: YYYY-MM-DD
+    val deadline: String? = null,
     @SerialName("is_completed") val isCompleted: Boolean = false,
     @SerialName("attachment_url") val attachmentUrl: String? = null
 )

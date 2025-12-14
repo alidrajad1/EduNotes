@@ -8,9 +8,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -78,8 +77,6 @@ fun HomeScreen(
                 )
             }
         },
-
-
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -140,9 +137,7 @@ fun HomeScreen(
                             Text("Belum ada kategori.", color = Color.Gray)
                         }
                     } else {
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        LazyColumn(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(state.categories) { category ->
@@ -208,36 +203,53 @@ fun CategoryItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (category.iconUrl != null) {
-                    AsyncImage(
-                        model = category.iconUrl,
-                        contentDescription = null,
-                        modifier = Modifier.size(60.dp).padding(bottom = 8.dp),
-                        contentScale = ContentScale.Fit
-                    )
-                } else {
-                    Icon(Icons.Default.Add, contentDescription = null, Modifier.size(40.dp), tint = Color.Gray)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (category.iconUrl != null) {
+                AsyncImage(
+                    model = category.iconUrl,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .background(Color.LightGray, RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.Gray)
                 }
-                Text(category.name, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
             }
 
-            IconButton(onClick = onEdit, modifier = Modifier.align(Alignment.TopStart)) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
-            }
+            Spacer(modifier = Modifier.width(16.dp))
 
-            IconButton(onClick = onDelete, modifier = Modifier.align(Alignment.TopEnd)) {
-                Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error)
+            Text(
+                text = category.name,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f) // Ambil sisa ruang
+            )
+
+            Row {
+                IconButton(onClick = onEdit) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = "Hapus", tint = MaterialTheme.colorScheme.error)
+                }
             }
         }
     }

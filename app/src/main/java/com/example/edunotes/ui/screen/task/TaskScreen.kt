@@ -49,24 +49,24 @@ fun TaskScreen(
     var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
-        // --- 1. TAMBAHAN NAVIGASI BAWAH (BOTTOM BAR) ---
+
         bottomBar = {
             NavigationBar {
-                // Tombol Home (Aktif)
+
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
                     label = { Text("Materi") },
                     selected = false, // Karena kita sedang di HomeScreen
                     onClick = {navController.navigate(NavRoutes.Home.route)}
                 )
-                // Tombol Tugas
+
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.CheckBox, contentDescription = "Tugas") },
                     label = { Text("Tugas") },
                     selected = true,
                     onClick = { navController.navigate(NavRoutes.Tasks.route) }
                 )
-                // Tombol Catatan
+
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.EditNote, contentDescription = "Catatan") },
                     label = { Text("Catatan") },
@@ -118,7 +118,7 @@ fun TaskScreen(
             isUploading = isUploading,
             onDismiss = { showDialog = false },
             onConfirm = { title, date, uri ->
-                val context = navController.context // Hacky context
+                val context = navController.context
                 val bytes = uri?.let {
                     context.contentResolver.openInputStream(it)?.use { stream -> stream.readBytes() }
                 }
@@ -143,10 +143,10 @@ fun TaskItem(task: Task, onToggle: () -> Unit, onDelete: () -> Unit) {
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 1. Checkbox
+
             Checkbox(checked = task.isCompleted, onCheckedChange = { onToggle() })
 
-            // 2. Teks & Gambar
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = task.title,
@@ -158,7 +158,7 @@ fun TaskItem(task: Task, onToggle: () -> Unit, onDelete: () -> Unit) {
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray
                 )
-                // Tampilkan gambar kecil jika ada lampiran
+
                 if (task.attachmentUrl != null) {
                     Spacer(modifier = Modifier.height(4.dp))
                     AsyncImage(

@@ -25,7 +25,6 @@ class MaterialViewModel : ViewModel() {
     private val _uploadState = MutableStateFlow(false)
     val uploadState = _uploadState.asStateFlow()
 
-    // Fungsi Load dengan Filter Kategori
     fun loadMaterials(categoryId: Long) {
         viewModelScope.launch {
             _uiState.value = MaterialUiState.Loading
@@ -47,14 +46,14 @@ class MaterialViewModel : ViewModel() {
 
                 val newMaterial = Material(
                     userId = userId,
-                    categoryId = categoryId, // Simpan ID Kategori
+                    categoryId = categoryId,
                     title = title,
                     content = content,
                     imageUrl = null
                 )
 
                 repository.addMaterial(newMaterial, imageBytes)
-                loadMaterials(categoryId) // Refresh list
+                loadMaterials(categoryId)
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
